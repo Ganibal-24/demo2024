@@ -89,8 +89,8 @@ vtysh
 ```
 conf t
 router ospf
- network 192.168.1.162/30 area 0
- network 192.168.2.166/30 area 0
+ network 192.168.1.160/30 area 0
+ network 192.168.2.164/30 area 0
 ```
 Просматриваю соседей:
 ```
