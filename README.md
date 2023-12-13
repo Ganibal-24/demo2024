@@ -112,3 +112,36 @@ show ip ospf neighbor
 # №1.3
 Настройте автоматическое распределение IP-адресов на роутере HQ-R.
 # Ход выполнения работы:
+Установка DHCP
+```
+apt-get install isc-dhcp-server
+```
+Вошёл в файл
+```
+nano /etc/default/isc-dhcp-server
+```
+Указал интерфейс который смотрит на HQ-SRV
+```
+INTERFACESv4="ens224"
+Ctrl + s - сохранил изменения
+Ctrl + x - вышел с файла
+```
+Далее следует настройка раздачи адресов, а для этого захожу в файл:
+```
+nano /etc/dhcp/dhcpd.conf
+```
+Прописываю конфиг
+```
+subnet 192.168.0.0 netmask 255.255.255.128 {
+range 192.168.0.10 192.168.0.125;
+option domain-name-servers 8.8.8.8, 8.8.4.4;
+option routers 192.168.0.1;
+}
+Ctrl + s - сохранил изменения
+Ctrl + x - вышел с файла
+```
+Применил настройку 
+```
+systemctl restart isc-dhcp-server.service
+```
+Проверить DHCP можно при помощи HQ-SRV, включив на нём DHCP.
