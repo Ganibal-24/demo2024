@@ -41,9 +41,9 @@ nano /etc/network/interfaces
 ```
 auto ens192
 iface ens192 inet static
-        address 10.12.10.5
+        address 10.12.10.6
         netmask 255.255.255.0.
-        gateway 10.12.34.254
+        gateway 10.12.10.254
 
 auto ens256
 iface ens256 inet static
@@ -107,8 +107,9 @@ router ospf
 ```
 show ip ospf neighbor
 ```
-Такие же действия повторяю с HQ-R и BR-R.
+Далее нужно прописать sysctl -w net.ipv4.ip_forward=1. Затем раскомментировать сроку net.ipv4.ip_forward в файле /etc/sysctl.conf. Сохранить настройку в vtysh. Проверить настройку можно с помощью команды sysctl -a | grep forward.
 
+Такие же действия повторяю с HQ-R и BR-R.
 # №1.3
 Настройте автоматическое распределение IP-адресов на роутере HQ-R.
 # Ход выполнения работы:
