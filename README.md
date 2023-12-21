@@ -224,3 +224,22 @@ firewall-cmd --permanent --zone=public --add-masquerade
 ```
 firewall-cmd --reload
 ```
+# №7
+Измерьте пропускную способность сети между двумя узлами HQ-R-ISP
+# Ход выполнения работы:
+Установка:
+```
+apt-get -y install iperf3 
+```
+Делаем ISP в роли сервера:
+```
+iperf3 -s
+```
+Если порт не открыт, то:
+```
+iptables -A INPUT -p tcp --dport 5201 -j ACCEPT
+```
+На HQ-R пишем:
+```
+iperf3 -c 192.168.0.162 -f M
+```
