@@ -69,7 +69,7 @@ systemctl reboot
 ```
 Точно также настроил остальные виртуальные машины.
 
-# №1.2
+# №2
 Настройте внутреннюю динамическую маршрутизацию по средствам FRR. Выберите и обоснуйте выбор протокола динамической маршрутизации из расчёта, что в дальнейшем сеть будет масштабироваться.
 # Ход выполнения работы:
 Установил пакет FRR:
@@ -110,7 +110,7 @@ show ip ospf neighbor
 Далее нужно прописать sysctl -w net.ipv4.ip_forward=1. Затем раскомментировать сроку net.ipv4.ip_forward в файле /etc/sysctl.conf. Сохранить настройку в vtysh. Проверить настройку можно с помощью команды sysctl -a | grep forward.
 
 Такие же действия повторяю с HQ-R и BR-R.
-# №1.3
+# №3
 Настройте автоматическое распределение IP-адресов на роутере HQ-R.
 # Ход выполнения работы:
 Установка DHCP
@@ -146,7 +146,7 @@ Ctrl + x - вышел с файла
 systemctl restart isc-dhcp-server.service
 ```
 Проверить DHCP можно при помощи HQ-SRV, включив на нём DHCP.
-# №1.4
+# №4
 Настройте локальные учётные записи на всех устройствах в соответствии с таблицей
 | Учётная запись | Пароль   | Примечание        |   
 | -----------    | -------- |------------       | 
@@ -166,3 +166,61 @@ usermod -aG root <имя пользователя>
 Пример:
 ```
 <имя пользовтеля>:x:0:501::/home/admin:/bin/bash
+```
+# №5
+Настройте туннель между маршрутизаторами HQ-R И BR-R.
+# Ход выполнения работы:
+Установка графического интерфейса nmtui:
+```
+apt install network-manager
+```
+Заходим в интерфейс:
+```
+nmtui
+```
+![image](https://github.com/Ganibal-24/demo2024/assets/148868527/aa3f89b4-258d-416d-b640-841dc113e882)
+
+Добавить IP tunnel
+
+![image](https://github.com/Ganibal-24/demo2024/assets/148868527/7119312a-f41a-46c5-bf1e-7d04fe7f29ac)
+
+![image](https://github.com/Ganibal-24/demo2024/assets/148868527/102808ba-b1f2-4e68-a05c-7b8afa776640)
+
+Для HQ-R:
+```
+nmcli connection modify HQ-R ip-tunnel.ttl 64
+ip r add 192.168.0.128/27 dev gre1
+```
+Для BR-R:
+```
+nmcli connection modify BR-R ip-tunnel.ttl 64
+ip r add 192.168.0.0/25 dev gre1
+```
+# №6
+Настройте NAT на всех маршрутизаторах 
+# Ход выполнения работы:
+Устанавливаем пакет:
+```
+apt-get -y install firewalld
+```
+Задаём автозагрузку:
+```
+systemctl enable --now firewalld
+```
+Прописываем интерфейс, который смотрит во внешнюю сеть:
+```
+firewall-cmd --permanent --zone=public --add-interface=ens192
+```
+Прописываем интерфейс, который смотрит во внутреннюю сеть:
+```
+firewall-cmd --permanent --zone=trusted --add-interface=ens224
+firewall-cmd --permanent --zone=trusted --add-interface=ens256
+```
+Включаем NAT:
+```
+firewall-cmd --permanent --zone=public --add-masquerade
+```
+Сохраняем правила:
+```
+firewall-cmd --reload
+```
